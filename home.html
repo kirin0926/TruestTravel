@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Trust Travel</title>
+  <link rel="stylesheet" type="text/css" href="static/assets/iconfont/iconfont.css"/>
+  <link rel="stylesheet" type="text/css" href="static/assets/css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="static/assets/css/home.css"/>
+</head>
+<body class="home-page pic-home-page">
+  <div class="home-login-btns">
+    <a href="javascript:;" class="home-login-btn js-showLogin">登录</a>
+  </div>
+  <div class="home-top-btns">
+    <a href="javascript:;" class="home-top-btn js-showLogintrial">申请试用</a>
+  </div>
+  <div id="loginModal" class="modal">
+    <div class="mask"></div>
+    <div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">提示 </h3>
+          <a href="javascript:;" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </a>
+        </div>
+        <div class="modal-body">
+          <form class="loginForm" action="#" method="post">
+            <div id="loginError" class="error"></div>
+            <div class="form-group">
+              <!--<label for="usermail" class="control-label sr-only">用户名:</label>-->
+              <div class="wp-input-group">
+                <span class="wp-input-group-addon user"><i class="iconfont icon-user"></i></span>
+                <input type="text" class="form-control" name="usermail" id="usermail" placeholder="请输入账号">
+                <span class="wp-input-group-clear js-input-clear"><i class="iconfont icon-delete"></i></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <!--<label for="username" class="control-label sr-only">密码:</label>-->
+              <div class="wp-input-group">
+                <span class="wp-input-group-addon lock"><i class="iconfont icon-lock"></i></span>
+                <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码">
+                <span class="wp-input-group-clear js-input-clear"><i class="iconfont icon-delete"></i></span>
+              </div>
+            </div>
+            <div class="form-group form-actions">
+              <button type="submit" class="btn btn-block btn-green js-login">登录</button>
+              <!-- <button type="button" class="btn btn-ghost btn-ghost-green js-showRegist">注册</button> -->
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<div id="loginModaltrial" class="modal">
+    <div class="mask"></div>
+    <div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">提示 </h3>
+          <a href="javascript:;" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </a>
+        </div>
+        <div class="modal-body">
+          <div class="trialword">发送邮件到 <br />zhangkun@Itrustdata.com.cn <br />申请试用</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="static/assets/js/jquery.min.js"></script>
+  <script type="text/javascript" src="static/assets/js/BigInt.js"></script>
+  <script type="text/javascript" src="static/assets/js/Barrett.js"></script>
+  <script type="text/javascript" src="static/assets/js/RSA.js"></script>
+  <script>
+    $(function() {
+      $('.js-login').on('click', function (e) {
+        e.preventDefault();
+        var key = getkey();
+        var usermail = $.trim($('#usermail').val());
+          password = encryptedString(key, $.trim($('#password').val()));
+          console.log(password);
+        if (usermail && password){
+          $('#loginError').text('');
+          $.ajax({
+            type: 'POST',
+            url: 'http://114.215.19.11:30009/index.php/Login/checkLogin',
+            data:{
+              email: usermail,
+              enpass: password
+            },
+          }).done(function (data) {
+          	console.log(data);
+            if (data) {
+              if (data.status == 0) {
+                // $('<span style="color: #fff;">' + usermail + ' </span>').insertBefore(
+                //   $(".navLinks .js-showLogin").text('退出').addClass('js-logout').removeClass(
+                //     'js-showLogin'));
+                // $(".actions button").remove();
+                location.href = data.href;
+              } else {
+                $('#loginError').text(data.content);
+              }
+            } else {
+              $('#loginError').text('发生错误。');
+            }
+          }).fail(function (error) {
+            $('#loginError').text('请求发生错误。' + error);
+          })
+        } else {
+          $('#loginError').text('请填写用户名和密码！');
+          return false;
+        }
+      });
+
+
+
+      $('[data-dismiss="modal"]').on('click', function() {
+        $(this).parents('.modal').hide();
+        $('.loginForm')[0].reset();
+      });
+
+
+
+      $('.js-showLogin').on('click', function() {
+        $('#loginModal').show();
+      });
+	  $('.js-showLogintrial').on('click',function(){
+	  	$('#loginModaltrial').show();
+	  })
+	
+
+
+      $('.js-input-clear').on('click', function() {
+        $(this).parent().find('input').val('');
+      });
+
+      $('.loginForm').find('input').on('focus', function() {
+        $(this).parent().find('.js-input-clear').css('display', 'inline-block');
+      }).on('blur', function() {
+        var $this = $(this);
+        setTimeout(function() {
+          $this.parent().find('.js-input-clear').css('display', 'none');
+        }, 100);
+      })
+    });
+  </script>
+</body>
+</html>
